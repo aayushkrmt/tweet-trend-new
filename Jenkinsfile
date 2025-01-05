@@ -17,7 +17,7 @@ environment {
 
     stage('SonarQube analysis') {
         steps {
-            withSonarQubeEnv('My SonarQube Server'){
+            withSonarQubeEnv('sonarqube-server'){
             sh "${env.scannerHome}/bin/sonar-scanner"
            }
        }
