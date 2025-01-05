@@ -6,6 +6,7 @@ pipeline {
     }
 environment {
     PATH = "/opt/apache-maven-3.9.9/bin:$PATH"
+    scannerHome = tool 'valaxy-sonar-scanner'
 }
     stages {
         stage('Build') {
@@ -13,5 +14,13 @@ environment {
                sh 'mvn clean deploy'
             }
         }
-    }
+
+    stage('SonarQube analysis') {
+        steps {
+            withSonarQubeEnv('My SonarQube Server'){
+            sh "${env.scannerHome}/bin/sonar-scanner"
+           }
+       }
+   }
+   }
 }
