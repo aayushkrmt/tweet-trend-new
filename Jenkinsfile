@@ -11,12 +11,16 @@ environment {
     stages {
         stage('Build') {
             steps {
-               sh 'mvn clean deploy'
+               sh 'mvn clean deploy -Dmaven.test.skip=true'
             }
         }
-
-    stage('SonarQube analysis') {
-        steps {
+        stage("Test'){
+            steps {
+                sh 'mvn surefire-report:report'
+            }    
+       }
+       stage('SonarQube analysis') {
+          steps {
             withSonarQubeEnv('sonarqube-server'){
             sh "${env.scannerHome}/bin/sonar-scanner"
            }
