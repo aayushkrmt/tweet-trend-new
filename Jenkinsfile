@@ -1,4 +1,7 @@
 def registry =  'https://aayushish.jfrog.io/'
+def imageName = 'aayushish.jfrog.io/valaxy-docker-local/ttrend'
+def version = '2.1.2'
+
 pipeline {
     agent {
          node {
@@ -20,13 +23,15 @@ environment {
                 sh 'mvn surefire-report:report'
             }    
        }
+
        stage('SonarQube analysis') {
           steps {
             withSonarQubeEnv('sonarqube-server'){
             sh "${env.scannerHome}/bin/sonar-scanner"
            }
-       }
+        }
       }
+      
        stage("Jar Publish") {
         steps {
             script {
@@ -52,5 +57,27 @@ environment {
             }
         }   
     }
+
+    stage(" Docker Build ") {
+      steps {
+        script {
+           echo '<--------------- Docker Build Started --------------->'
+           app = docker.build(imageName+":"+version)
+           echo '<--------------- Docker Build Ends --------------->'
+        }
+      }
+    }
+
+     stage (" Docker Publish "){
+        steps {
+            script {
+               echo '<--------------- Docker Publish Started --------------->'  
+                docker.withRegistry(registry, 'artfiact-cred'){
+                    app.push()
+                }    
+               echo '<--------------- Docker Publish Ended --------------->'  
+            }
+        }
    }
+ }
 }
